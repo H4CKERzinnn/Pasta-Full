@@ -1,0 +1,483 @@
+-- ============================== --
+-- FOUR HUB --
+-- ============================== --
+
+-- ===== SERVICES ===== --
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- ===== VARIABLES ===== --
+
+local PlayerSpeed = 16
+local JumpPowerValue = 50
+local NoClipEnabled = false
+local AutoFarmEnabled = false
+local AutoCollectEnabled = false
+local AutoBuyEnabled = false
+local AutoGachaEnabled = false
+
+-- ===== FUNCTIONS ===== --
+
+local function AutoFarm()
+    while AutoFarmEnabled do
+        -- colocar seu código de farm aqui
+        print("Auto Farm ativo...")
+        task.wait(1)
+    end
+end
+
+local Fluent, SaveManager, InterfaceManager =
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/discoart/FluentPlus/refs/heads/main/test.luau"))()
+
+-- ============================== --
+-- WINDOW --
+-- ============================== --
+
+local Window = Fluent:CreateWindow({
+    Title = "FOUR HUB",
+    SubTitle = "nome do jogo",
+    Icon = "home",
+    Size = UDim2.fromOffset(500, 400),
+    TabWidth = 160,
+    Acrylic = true,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl,
+    Search = true
+})
+
+-- ============================== --
+-- TABS --
+-- ============================== --
+
+local Tabs = {
+    Info = Window:AddTab({ Title = "Info", Icon = "message-circle" }),
+    Player = Window:AddTab({ Title = "Player", Icon = "user" }),
+    Farm = Window:AddTab({ Title = "Dungeon", Icon = "leaf" }),
+    Map = Window:AddTab({ Title = "Maps", Icon = "map" }),
+    Shop = Window:AddTab({ Title = "Shop", Icon = "shopping-cart" }),
+    Misc = Window:AddTab({ Title = "Misc", Icon = "settings" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+}
+
+Window:SelectTab(1)
+
+-- ============================== --
+-- Info TAB --
+-- ============================== --
+
+local InfoSection = Tabs.Info:AddSection("Info")
+
+InfoSection:AddButton({
+    Title = "Discord",
+    Description = "Copie o link do servidor ofc",
+    Icon = "copy",
+    Callback = function()
+        setclipboard("https://discord.gg/p6d6NuMnnc")
+        Fluent:Notify({
+            Title = "Discord",
+            Content = "Link copiado com sucesso!",
+            Duration = 3
+        })
+    end
+})
+
+-- ============================== --
+-- Player TAB - Todas as Features (CORRIGIDO)
+-- ============================== --
+
+local PlayerSection = Tabs.Player:  AddSection("Player")
+
+-- ===== SPEED SLIDER (Máximo 200) =====
+PlayerSection:  AddSlider("SpeedSlider", {
+    Title = "Velocidade",
+    Description = "Altere a velocidade do seu personagem",
+    Min = 0,
+    Max = 200,  
+    Default = 16,
+    Rounding = 1,
+    Icon = "user",
+    Visible = true,
+    Callback = function(Value)
+        PlayerSpeed = Value
+        print("Velocidade alterada para:", Value)
+        
+        local player = Players.LocalPlayer
+        if player and player.Character then
+            local humanoid = player.Character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid.WalkSpeed = PlayerSpeed
+            end
+        end
+    end
+})
+
+-- ===== JUMP INFINITO (CORRIGIDO) =====
+PlayerSection: AddSlider("JumpPowerSlider", {
+    Title = "Poder do Pulo",
+    Description = "Altere a força do seu pulo",
+    Min = 0,
+    Max = 200,
+    Default = 50,
+    Rounding = 1,
+    Icon = "arrow-up",
+    Callback = function(Value)
+        JumpPowerValue = Value
+        print("Poder do pulo alterado para:", Value)
+        
+        local player = Players.LocalPlayer
+        if player and player.Character then
+            local humanoid = player.Character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid.JumpPower = JumpPowerValue
+            end
+        end
+    end
+})
+
+-- ===== NO CLIP =====
+PlayerSection:AddToggle("NoClipToggle", {
+    Title = "No Clip",
+    Default = false,
+    Icon = "phase-in-out",
+    Callback = function(v)
+        NoClipEnabled = v
+        
+        if v then
+            print("No Clip ativado!")
+            
+            local player = Players.LocalPlayer
+            if player and player.Character then
+                for _, part in pairs(player.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part. CanCollide = false
+                    end
+                end
+            end
+            
+            Players.LocalPlayer.CharacterAdded:Connect(function(character)
+                if NoClipEnabled then
+                    task.wait(0.1)
+                    for _, part in pairs(character:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part. CanCollide = false
+                        end
+                    end
+                end
+            end)
+            
+        else
+            print("No Clip desativado!")
+            
+            local player = Players.LocalPlayer
+            if player and player. Character then
+                for _, part in pairs(player.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part. CanCollide = true
+                    end
+                end
+            end
+        end
+    end
+})
+
+-- ===== RESETAR PERSONAGEM =====
+PlayerSection:AddButton({
+    Title = "Resetar Personagem",
+    Description = "Volte a ter 100 de vida",
+    Icon = "refresh-cw",
+    Callback = function()
+        print("Personagem resetado!")
+        
+        local player = Players. LocalPlayer
+        if player and player.Character then
+            local humanoid = player.Character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid.Health = 0
+            end
+        end
+    end
+})
+
+-- ===== APLICAR VELOCIDADE AO RESPAWNAR =====
+Players.LocalPlayer.CharacterAdded:Connect(function(character)
+    task.wait(0.1)
+    local humanoid = character:FindFirstChild("Humanoid")
+    if humanoid then
+        humanoid. WalkSpeed = PlayerSpeed
+        humanoid.JumpPower = JumpPowerValue
+    end
+end)
+
+-- ============================== --
+-- Farm TAB --
+-- ============================== --
+
+local FarmSection = Tabs.Farm:AddSection("Farm")
+
+FarmSection:AddToggle("FarmToggle1", {
+    Title = "Auto Dungeon",
+    Default = false,
+    Callback = function(v)
+        print("Auto Farm:", v)
+    end
+})
+
+FarmSection:AddButton({
+    Title = "Criar e Entrar Dungeon",
+    Callback = function()
+        print("Criando e entrando dg")
+    end
+})
+
+FarmSection:AddToggle("FarmToggle2", {
+    Title = "Auto Missão",
+    Default = false,
+    Callback = function(v)
+        print("Auto Farm M on:", v)
+    end
+})
+
+-- ============================== --
+-- Maps TAB --
+-- ============================== --
+
+-- nao sei se vai ter
+
+-- ============================== --
+-- Gachas TAB --
+-- ============================== --
+
+ -- nao sei se vai ter
+
+-- ============================== --
+-- Shop TAB --
+-- ============================== --
+
+local ShopSection = Tabs.Shop:AddSection("Loja")
+
+-- Criar dropdown pra selecionar lojas
+ShopSection:AddDropdown("ShopDropdown", {
+    Title = "Selecionar Loja",
+    Values = {
+        "Loja Principal",
+        "Loja VIP",
+        "Loja Premium",
+        "Loja Limited"
+    },
+    Multi = false,
+    Default = 1,
+    Callback = function(v)
+        print("Loja selecionada:", v)
+        
+        if v == "Loja Principal" then
+            print("Abrindo Loja Principal...")
+            -- Remote para Loja Principal
+            local remote = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ShopRemote")
+            remote: FireServer("BuyFromMain", itemId, quantity)
+            
+        elseif v == "Loja VIP" then
+            print("Abrindo Loja VIP...")
+            -- Remote para Loja VIP
+            local remote = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ShopRemote")
+            remote:FireServer("BuyFromVIP", itemId, quantity)
+            
+        elseif v == "Loja Premium" then
+            print("Abrindo Loja Premium...")
+            -- Remote para Loja Premium
+            local remote = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ShopRemote")
+            remote:FireServer("BuyFromPremium", itemId, quantity)
+            
+        elseif v == "Loja Limited" then
+            print("Abrindo Loja Limited...")
+            -- Remote para Loja Limited
+            local remote = game: GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ShopRemote")
+            remote:FireServer("BuyFromLimited", itemId, quantity)
+        end
+    end
+})
+
+-- Botão pra confirmar compra
+ShopSection:AddButton({
+    Title = "Comprar Item",
+    Callback = function()
+        print("Comprando item...")
+        -- O remote será acionado aqui quando o usuário clicar
+    end
+})
+
+-- Auto Buy com Remotes
+ShopSection: AddToggle("AutoBuyToggle", {
+    Title = "Auto Buy",
+    Default = false,
+    Callback = function(v)
+        AutoBuyEnabled = v
+        print("Auto Buy:", v)
+        
+        if v then
+            while AutoBuyEnabled do
+                print("Comprando automaticamente...")
+                
+                -- Remote para auto buy
+                local remote = game: GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("ShopRemote")
+                remote:FireServer("AutoBuy", itemId, quantity)
+                
+                task.wait(2)
+            end
+        end
+    end
+})
+
+-- ============================== --
+-- Misc TAB --
+-- ============================== --
+
+local MiscSection = Tabs.Misc:AddSection("Misc")
+
+MiscSection:AddButton({
+    Title = "Anti AFK",
+    Callback = function()
+        local VirtualUser = game:GetService("VirtualUser")
+        game:GetService("Players").LocalPlayer.Idled:Connect(function()
+            VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+            wait(1)
+            VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+        end)
+        print("Anti AFK ativado!")
+    end
+})
+
+MiscSection:AddButton({
+    Title = "Fps Boost",
+    Callback = function()
+        local Lighting = game:GetService("Lighting")
+        Lighting.GlobalShadows = false
+        Lighting.FogEnd = 9e9
+        Lighting.Brightness = 0
+        settings().Rendering.QualityLevel = "Level01"
+        
+        for i,v in pairs(game:GetDescendants()) do
+            if v:IsA("Part") or v:IsA("UnionOperation") or v:IsA("MeshPart") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") then
+                v.Material = "Plastic"
+                v.Reflectance = 0
+            elseif v:IsA("Decal") or v:IsA("Texture") then
+                v.Transparency = 1
+            elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+                v.Lifetime = NumberRange.new(0)
+            elseif v:IsA("Explosion") then
+                v.BlastPressure = 0
+                v.BlastRadius = 0
+            end
+        end
+        print("FPS Boost ativado!")
+    end
+})
+
+MiscSection:AddButton({
+    Title = "Rejoin",
+    Callback = function()
+        local TeleportService = game:GetService("TeleportService")
+        local Players = game:GetService("Players")
+        TeleportService:Teleport(game.PlaceId, Players.LocalPlayer)
+        print("Rejoin no mesmo servidor...")
+    end
+})
+
+MiscSection:AddButton({
+    Title = "Hop Servidor",
+    Callback = function()
+        local HttpService = game:GetService("HttpService")
+        local TeleportService = game:GetService("TeleportService")
+        
+        local function hop()
+            local servers = HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"))
+            for _, v in pairs(servers.data) do
+                if v.playing < v.maxPlayers and v.id ~= game.JobId then
+                    TeleportService:TeleportToPlaceInstance(game.PlaceId, v.id)
+                    wait(5) -- espera um pouco caso falhe
+                    return
+                end
+            end
+            print("Nenhum servidor com vaga encontrado, tentando novamente...")
+            hop() -- tenta de novo se todos estiverem cheios
+        end
+        
+        hop()
+        print("Procurando novo servidor...")
+    end
+})
+
+-- Toggle para Auto Execute (executa o script principal ao entrar no jogo)
+local autoExecEnabled = false
+
+MiscSection:AddToggle({
+    Title = "Auto Executar o Script",
+    Default = false,
+    Callback = function(value)
+        autoExecEnabled = value
+        
+        if value then
+            -- Coloque aqui o código completo da sua GUI/hub (tudo que você executa normalmente)
+            -- Exemplo: loadstring(game:HttpGet("https://seu-link-do-script.com"))() 
+            -- Ou cole diretamente o código da GUI aqui
+            
+            -- Como exemplo genérico:
+            print("Auto Execute ATIVADO - o script será executado ao entrar em qualquer jogo")
+            
+            -- Conexão que roda ao spawnar o personagem
+            game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function()
+                -- Cole aqui o código que você quer que rode automaticamente
+                -- Ex: loadstring(... )() ou a criação da GUI
+            end)
+        else
+            print("Auto Execute DESATIVADO")
+        end
+    end
+})
+
+-- ==============================
+-- Settings TAB
+-- ==============================
+
+local SettingsSection = Tabs.Settings:AddSection("Interface / Temas")
+
+-- ==============================
+-- MINIMIZER (quadradinho flutuante)
+-- ==============================
+
+Fluent:CreateMinimizer({
+    Size = UDim2.fromOffset(70, 70),
+    Position = UDim2.new(0, 20, 0, 20),
+    Icon = "rbxassetid://88148068006647",
+    Acrylic = false,
+    Corner = 0,
+    Draggable = true,
+    Visible = true,
+    
+})
+
+-- ============================== --
+-- SAVE / THEME MANAGERS --
+-- ============================== --
+
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+
+InterfaceManager:SetFolder("MyScriptHub")
+SaveManager:SetFolder("MyScriptHub/Configs")
+
+-- Aba de temas + configs AUTOMÁTICA
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+
+-- ============================== --
+-- NOTIFY --
+-- ============================== --
+
+Fluent:Notify({
+    Title = "Four Hub",
+    Content = "Sucess",
+    Duration = 4
+})
