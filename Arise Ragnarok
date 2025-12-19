@@ -416,17 +416,11 @@ MiscSection:AddToggle({
         autoExecEnabled = value
         
         if value then
-            -- Coloque aqui o código completo da sua GUI/hub (tudo que você executa normalmente)
-            -- Exemplo: loadstring(game:HttpGet("https://seu-link-do-script.com"))() 
-            -- Ou cole diretamente o código da GUI aqui
-            
-            -- Como exemplo genérico:
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/H4CKERzinnn/Pasta-Full/refs/heads/main/Arise%20Ragnarok"))()
             print("Auto Execute ATIVADO - o script será executado ao entrar em qualquer jogo")
             
-            -- Conexão que roda ao spawnar o personagem
             game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function()
-                -- Cole aqui o código que você quer que rode automaticamente
-                -- Ex: loadstring(... )() ou a criação da GUI
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/H4CKERzinnn/Pasta-Full/refs/heads/main/Arise%20Ragnarok"))()
             end)
         else
             print("Auto Execute DESATIVADO")
