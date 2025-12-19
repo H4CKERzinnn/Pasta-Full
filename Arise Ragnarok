@@ -15,6 +15,7 @@ local AutoFarmEnabled = false
 local AutoCollectEnabled = false
 local AutoBuyEnabled = false
 local AutoGachaEnabled = false
+local autoExecEnabled = false
 
 -- ===== FUNCTIONS ===== --
 
@@ -406,24 +407,22 @@ MiscSection:AddButton({
     end
 })
 
--- Toggle para Auto Execute (executa o script principal ao entrar no jogo)
-local autoExecEnabled = false
-
-MiscSection:AddToggle({
+MiscSection:AddToggle("AutoExecToggle", {
     Title = "Auto Executar o Script",
     Default = false,
     Callback = function(value)
-        autoExecEnabled = value
-        
         if value then
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/H4CKERzinnn/Pasta-Full/refs/heads/main/Arise%20Ragnarok"))()
-            print("Auto Execute ATIVADO - o script será executado ao entrar em qualquer jogo")
-            
+            print("Auto Execute ATIVADO")
+
             game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function()
                 loadstring(game:HttpGet("https://raw.githubusercontent.com/H4CKERzinnn/Pasta-Full/refs/heads/main/Arise%20Ragnarok"))()
+                
+                Fluent:Notify({
+                    Title = "Hub",
+                    Content = "Auto carregado!",
+                    Duration = 5
+                })
             end)
-        else
-            print("Auto Execute DESATIVADO")
         end
     end
 })
